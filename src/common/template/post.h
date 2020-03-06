@@ -17,13 +17,7 @@ public:
     static const CTemplatePostPtr CreateTemplatePtr(CTemplatePost* ptr);
 
 public:
-    CTemplatePost(/*
-        const CDestination& business = CDestination(),
-        const CDestination& customer = CDestination(),
-        uint32 height_begin = 0,
-        uint32 height_cycle = 0,
-        uint64 total = 0,
-        uint64 price = 0*/);
+    CTemplatePost();
 
     CTemplatePost(const std::vector<unsigned char>& vchDataIn);
 
@@ -61,8 +55,8 @@ public:
     uint32 m_height_cycle;
     uint64 m_total;
     uint64 m_price;
-    uint8 m_post_base[72];
-    static const int DataLen = sizeof(m_business) + sizeof(m_customer) + sizeof(m_height_begin) + sizeof(m_height_cycle) + sizeof(m_total) + sizeof(m_price) + + sizeof(m_post_base);
+    uint8 m_post_base[40];
+    static const int DataLen = sizeof(m_business) + sizeof(m_customer) + sizeof(m_height_begin) + sizeof(m_height_cycle) + sizeof(m_total) + sizeof(m_price) + sizeof(m_post_base);
 };
 
 #endif

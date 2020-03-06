@@ -213,9 +213,8 @@ bool CTemplatePost::BuildTxSignature(const uint256& hash,
     return true;
 }
 
-
 bool CTemplatePost::VerifyTransaction(const CTransaction& tx,uint256 &block_hash,uint32 height,uint64 nValueIn)
-{
+{	
     if ((tx.nAmount + tx.nTxFee) != m_price)
     {
         return false;
@@ -229,39 +228,39 @@ bool CTemplatePost::VerifyTransaction(const CTransaction& tx,uint256 &block_hash
     {
         return false;
     }
-
-    const uint8_t *bufsectorIds = &m_post_base[0];
-    const uint8_t *bufflattenedCommRs = &m_post_base[8];
-    const uint8_t *bufproverID = &m_post_base[40];
-
-    std::vector<uint8_t> post_data = tx.vchData;
-    post_data.erase(post_data.begin() + 20);
-
-    uint8_t *randomness = (uint8_t*)(&(block_hash[0]));
-    uint8_t *bufproof = post_data.data();
-    uint8_t *bufwinners = post_data.data() + 384;   
-    if (post_data.size() != (384 + 160))
+    if (tx.vchData.size() != 545)
     {
         return false;
     }
 
-    VerifyPoStResponse * resp = verify_post(1024,
-			    (const uint8_t (*)[32])randomness,
-			    2,
-	   		    (const uint64_t *)bufsectorIds, 
-			    1,
-			    (const uint8_t *)bufflattenedCommRs,
-			    32,
-			    (const uint8_t *)bufproof,
-			    384,
-			    (const FFICandidate *)bufwinners,
-			    160,
-			    (const uint8_t (*)[32])bufproverID);
-    if (resp->error_msg != 0)
-    {
-        return false; 
-    }
-    return true;
+    uint8_t bufrandomness[] = {9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	//uint8_t *randomness = (uint8_t*)(&(block_hash[0]));
+    std::vector<uint8> result = tx.vchData;
+    result.erase(result.begin() + 20);
+    
+    uint8 *bufproof = result.data();  
+    uint8 *bufwinners = result.data() + 384; 
+    
+    const uint8_t *sectorIds = &m_post_base[0];
+    const uint8_t *flattenedCommRs = &m_post_base[8];
+    const uint8_t proverID[32] = {0};
+
+	VerifyPoStResponse *resp = verify_post(
+                    1024,
+	                (const uint8_t (*)[32])bufrandomness,
+	                2,
+	                (const uint64_t *)sectorIds,
+	                1,
+	                (const uint8_t *)flattenedCommRs,
+	                32,
+	                (const uint8_t *)bufproof,
+	                384,
+	                (const FFICandidate *)bufwinners,
+	                2,
+	                (const uint8_t (*)[32])proverID);
+    bool res = resp->is_valid;
+    destroy_verify_post_response(resp);
+    return res;
 }
 
 bool CTemplatePost::VerifySignature(const uint256& hash, const std::vector<uint8>& vchSig, int height, const uint256& fork)
