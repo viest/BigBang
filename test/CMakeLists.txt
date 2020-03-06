@@ -42,6 +42,8 @@ target_link_libraries(test_big
     xengine
     storage
     ${Boost_LOG_LIBRARY}
+    filecoin
+    OpenCL
 )
 
 add_executable(test_ctsdb test_big_main.cpp test_big.h test_big.cpp ctsdb_test.cpp)

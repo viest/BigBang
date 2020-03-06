@@ -21,6 +21,7 @@
 #include "transaction.h"
 #include "vote.h"
 #include "weighted.h"
+#include "post.h"
 
 using namespace std;
 using namespace xengine;
@@ -47,6 +48,7 @@ static const CTypeInfoSet setTypeInfo = {
     { TEMPLATE_PROOF, new CTemplateProof, "mint" },
     { TEMPLATE_DELEGATE, new CTemplateDelegate, "delegate" },
     { TEMPLATE_EXCHANGE, new CTemplateExchange, "exchange" },
+    { TEMPLATE_POST, new CTemplatePost, "post" },
     { TEMPLATE_VOTE, new CTemplateVote, "vote" },
 };
 

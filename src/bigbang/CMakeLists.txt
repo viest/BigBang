@@ -103,6 +103,8 @@ target_link_libraries(bigbang
     delegate    
     jsonrpc
     common
+    filecoin
+    OpenCL
 )
 
 # create symbol link

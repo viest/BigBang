@@ -8,6 +8,7 @@
 #include "../common/template/exchange.h"
 #include "../common/template/mint.h"
 #include "../common/template/vote.h"
+#include "../common/template/post.h"
 #include "address.h"
 #include "wallet.h"
 
@@ -510,7 +511,7 @@ Errno CCoreProtocol::VerifyBlockTx(const CTransaction& tx, const CTxContxt& txCo
 Errno CCoreProtocol::VerifyTransaction(const CTransaction& tx, const vector<CTxOut>& vPrevOutput, int nForkHeight, const uint256& fork)
 {
     CDestination destIn = vPrevOutput[0].destTo;
-    int64 nValueIn = 0;
+    uint64 nValueIn = 0;
     for (const CTxOut& output : vPrevOutput)
     {
         if (destIn != output.destTo)
@@ -564,6 +565,34 @@ Errno CCoreProtocol::VerifyTransaction(const CTransaction& tx, const vector<CTxO
     if (!destIn.VerifyTxSignature(tx.GetSignatureHash(), tx.hashAnchor, tx.sendTo, vchSig, nForkHeight, fork))
     {
         return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid signature\n");
+    }
+
+    if (destIn.IsTemplate() && destIn.GetTemplateId().GetType() == TEMPLATE_POST)
+    {
+        auto template_p = CTemplate::CreateTemplatePtr(TEMPLATE_POST,tx.vchSig);
+        CTemplatePost* post = dynamic_cast<CTemplatePost*>(template_p.get());
+        if (nForkHeight >= post->m_height_begin)
+        {
+            static IBlockChain* pBlockChain = nullptr;
+            if (pBlockChain == nullptr)
+            {
+                GetObject("blockchain", pBlockChain);
+            }
+            int hash_height = nForkHeight - ((nForkHeight - post->m_height_begin) % post->m_height_cycle);
+            std::vector<uint256> blocks_hash;
+            if (!pBlockChain->GetBlockHash(GetGenesisBlockHash(), hash_height, blocks_hash))
+            {
+                return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid signature\n");
+            }
+            if (!post->VerifyTransaction(tx,blocks_hash[0],nForkHeight,nValueIn))
+            {
+                return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid signature\n");
+            }
+        }
+        else
+        {
+            return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid signature\n");
+        }
     }
 
     // locked coin template: nValueIn >= tx.nAmount + tx.nTxFee + nLockedCoin
