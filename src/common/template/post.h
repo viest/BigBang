@@ -26,12 +26,6 @@ public:
                                     std::set<CDestination>& setSubDest, std::vector<uint8>& vchSubSig) const;
     virtual void GetTemplateData(bigbang::rpc::CTemplateResponse& obj, CDestination&& destInstance) const;
 
-    virtual bool BuildTxSignature(const uint256& hash,
-                                  const uint256& hashAnchor,
-                                  const CDestination& destTo,
-                                  const std::vector<uint8>& vchPreSig,
-                                  std::vector<uint8>& vchSig) const;
-
     bool VerifyTransaction(const CTransaction& tx,
                             uint256 &block_hash,
                             uint32 height,
@@ -53,7 +47,7 @@ public:
     uint32 m_height_cycle;
     uint64 m_total;
     uint64 m_price;
-    uint8 m_post_base[40];
+    uint8  m_post_base[40];
     static const uint32 SafeHeight = 5;
     static const uint32 DataLen = sizeof(m_business) + sizeof(m_customer) + sizeof(m_height_begin) + sizeof(m_height_cycle) + sizeof(m_total) + sizeof(m_price) + sizeof(m_post_base);
 };

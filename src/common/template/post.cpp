@@ -34,23 +34,25 @@ CTemplatePost::CTemplatePost()
     m_height_cycle = 0;
     m_total = 0;
     m_price = 0;
-    memset(m_post_base,0,sizeof(m_post_base));
-    std::vector<uint8> v_post_data;
-    v_post_data.assign(m_post_base,m_post_base + sizeof(m_post_base));
     vchData.clear();
     CODataStream os(vchData);
-    os << m_business.prefix << m_business.data << m_customer.prefix << m_customer.data << m_height_begin << m_height_cycle << m_total << m_price << v_post_data;
+    os << m_business.prefix << m_business.data << m_customer.prefix << m_customer.data << m_height_begin << m_height_cycle << m_total << m_price;
+    for (int i = 0; i < sizeof( m_post_base); i++)
+    {
+        os << m_post_base[i];
+    }
     nId = CTemplateId(nType, bigbang::crypto::CryptoHash(vchData.data(), vchData.size()));
-
 }
 
 CTemplatePost::CTemplatePost(const std::vector<unsigned char>& vchDataIn)
   : CTemplate(TEMPLATE_POST)
 {
     xengine::CIDataStream is(vchDataIn);
-    std::vector<uint8> v_post_data;
-    is >> m_business.prefix >> m_business.data >> m_customer.prefix >> m_customer.data >> m_height_begin >> m_height_cycle >> m_total >> m_price >> v_post_data;
-    memcpy(m_post_base,v_post_data.data(),sizeof(m_post_base));
+    is >> m_business.prefix >> m_business.data >> m_customer.prefix >> m_customer.data >> m_height_begin >> m_height_cycle >> m_total >> m_price;
+    for (int i = 0; i < sizeof( m_post_base); i++)
+    {
+        is >> m_post_base[i];
+    }
     vchData.assign(vchDataIn.begin(), vchDataIn.begin() + DataLen);
     nId = CTemplateId(nType, bigbang::crypto::CryptoHash(vchData.data(), vchData.size()));
 }
@@ -60,17 +62,6 @@ CTemplatePost* CTemplatePost::clone() const
     return new CTemplatePost(*this);
 }
 
-void CTemplatePost::GetTemplateData(bigbang::rpc::CTemplateResponse& obj, CDestination&& destInstance) const
-{
-    obj.post.strBusiness = m_business.ToString();
-    obj.post.strCustomer = m_customer.ToString();
-    obj.post.nHeight_Begin = m_height_begin;
-    obj.post.nHeight_Cycle = m_height_cycle;
-    obj.post.nTotal = m_total;
-    obj.post.nPrice = m_price;
-    obj.post.strPost_Base = ToHexString( m_post_base,sizeof(m_post_base));
-}
-
 const CTemplatePostPtr CTemplatePost::CreateTemplatePtr(CTemplatePost* ptr)
 {
     return boost::dynamic_pointer_cast<CTemplatePost>(CTemplate::CreateTemplatePtr(ptr));
@@ -78,7 +69,7 @@ const CTemplatePostPtr CTemplatePost::CreateTemplatePtr(CTemplatePost* ptr)
 
 bool CTemplatePost::ValidateParam() const
 {
-    if (m_height_cycle <= SafeHeight)
+    if (m_height_cycle < SafeHeight)
     {
         return false;
     }
@@ -93,22 +84,48 @@ bool CTemplatePost::ValidateParam() const
     return true;
 }
 
-bool CTemplatePost::SetTemplateData(const vector<uint8>& vchDataIn)
+bool CTemplatePost::GetSignDestination(const CTransaction& tx, const std::vector<uint8>& vchSig,
+                                           std::set<CDestination>& setSubDest, std::vector<uint8>& vchSubSig) const
 {
-    CIDataStream is(vchDataIn);
+    int height;
+    xengine::CIDataStream ds(tx.vchSig);
     try
     {
-        std::vector<uint8> v_post_data;
-        is >> m_business.prefix >> m_business.data >> m_customer.prefix >> m_customer.data >> m_height_begin >> m_height_cycle >> m_total >> m_price >> v_post_data;
-        memcpy(m_post_base,v_post_data.data(),sizeof(m_post_base));
+        ds >> height;
     }
-    catch (exception& e)
+    catch (const std::exception& e)
     {
         StdError(__PRETTY_FUNCTION__, e.what());
         return false;
     }
+    setSubDest.clear();
+    uint32 height_max = m_height_begin + (m_total / m_price) * m_height_cycle;
+    if (height < m_height_begin + SafeHeight)
+    {
+        return false;
+    }
+    else if (height < height_max + SafeHeight)
+    {
+        setSubDest.insert(m_business);
+    }
+    else
+    {
+        setSubDest.insert(m_customer);
+    }
     return true;
 }
+
+void CTemplatePost::GetTemplateData(bigbang::rpc::CTemplateResponse& obj, CDestination&& destInstance) const
+{
+    obj.post.strBusiness = m_business.ToString();
+    obj.post.strCustomer = m_customer.ToString();
+    obj.post.nHeight_Begin = m_height_begin;
+    obj.post.nHeight_Cycle = m_height_cycle;
+    obj.post.nTotal = m_total;
+    obj.post.nPrice = m_price;
+    obj.post.strPost_Base = ToHexString( m_post_base,sizeof(m_post_base));
+}
+
 
 bool CTemplatePost::SetTemplateData(const bigbang::rpc::CTemplateRequest& obj, CDestination&& destInstance)
 {
@@ -139,29 +156,45 @@ bool CTemplatePost::SetTemplateData(const bigbang::rpc::CTemplateRequest& obj, C
     return true;
 }
 
+bool CTemplatePost::SetTemplateData(const vector<uint8>& vchDataIn)
+{
+    CIDataStream is(vchDataIn);
+    try
+    {
+        is >> m_business.prefix >> m_business.data >> m_customer.prefix >> m_customer.data >> m_height_begin >> m_height_cycle >> m_total >> m_price;
+        for (int i = 0; i < sizeof( m_post_base); i++)
+        {
+            is >> m_post_base[i];
+        }
+    }
+    catch (exception& e)
+    {
+        StdError(__PRETTY_FUNCTION__, e.what());
+        return false;
+    }
+    return true;
+}
+
 void CTemplatePost::BuildTemplateData()
 {
     vchData.clear();
-    std::vector<uint8> v_post_data;
-    v_post_data.assign(m_post_base,m_post_base + sizeof(m_post_base));
     CODataStream os(vchData);
-    os << m_business.prefix << m_business.data << m_customer.prefix << m_customer.data << m_height_begin << m_height_cycle << m_total << m_price << v_post_data;
-    
+    os << m_business.prefix << m_business.data << m_customer.prefix << m_customer.data << m_height_begin << m_height_cycle << m_total << m_price;
+    for (int i = 0; i < sizeof( m_post_base); i++)
+    {
+        os << m_post_base[i];
+    }
 }
 
 bool CTemplatePost::VerifyTxSignature(const uint256& hash, const uint256& hashAnchor, const CDestination& destTo,
                                           const vector<uint8>& vchSig, const int32 nForkHeight, bool& fCompleted) const
 {
-    uint32 height_max = SafeHeight + m_height_begin + ((m_total / m_price) + 1) * m_height_cycle;
-    if (nForkHeight >= height_max)
+    uint32 height_max = m_height_begin + (m_total / m_price) * m_height_cycle;
+    if (nForkHeight < m_height_begin + SafeHeight)
     {
-        if (m_customer.GetPubKey().Verify(hash, vchSig))
-        {
-            fCompleted = true;
-            return true;
-        }
+        return false;
     }
-    else if (nForkHeight >= m_height_begin)
+    else if (nForkHeight < height_max + SafeHeight)
     {
         if (m_business.GetPubKey().Verify(hash, vchSig))
         {
@@ -171,52 +204,19 @@ bool CTemplatePost::VerifyTxSignature(const uint256& hash, const uint256& hashAn
     }
     else
     {
-        return false;
+        if (m_customer.GetPubKey().Verify(hash, vchSig))
+        {
+            fCompleted = true;
+            return true;
+        }
     }
     return false;
 }
 
-bool CTemplatePost::GetSignDestination(const CTransaction& tx, const std::vector<uint8>& vchSig,
-                                           std::set<CDestination>& setSubDest, std::vector<uint8>& vchSubSig) const
-{
-    int height;
-    xengine::CIDataStream ds(tx.vchSig);
-    try
-    {
-        ds >> height;
-    }
-    catch (const std::exception& e)
-    {
-        StdError(__PRETTY_FUNCTION__, e.what());
-        return false;
-    }
-    setSubDest.clear();
-    uint32 height_max = SafeHeight + m_height_begin + ((m_total / m_price) + 1) * m_height_cycle;
-    if (height >= height_max)
-    {
-        setSubDest.insert(m_customer);
-    }
-    else if (height >= m_height_begin)
-    {
-        setSubDest.insert(m_business);
-    }
-    return true;
-}
-
-bool CTemplatePost::BuildTxSignature(const uint256& hash,
-                                         const uint256& hashAnchor,
-                                         const CDestination& destTo,
-                                         const vector<uint8>& vchPreSig,
-                                         vector<uint8>& vchSig) const
-{
-    vchSig.insert(vchSig.end(), vchPreSig.begin(), vchPreSig.end());
-    return true;
-}
-
 bool CTemplatePost::VerifyTransaction(const CTransaction& tx,uint256 &block_hash,uint32 height,uint64 nValueIn)
 {
-    uint32 height_max = SafeHeight + m_height_begin + ((m_total / m_price) + 1) * m_height_cycle;
-    if (height >= height_max)
+    uint32 height_max = m_height_begin + (m_total / m_price) * m_height_cycle;
+    if (height >= height_max + SafeHeight)
     {
         return true;
     }

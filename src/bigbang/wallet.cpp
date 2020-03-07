@@ -578,10 +578,10 @@ bool CWallet::SignTransaction(const CDestination& destIn, CTransaction& tx, cons
     }
     if (tx.sendTo.GetTemplateId(tid) && tid.GetType() == TEMPLATE_POST)
     {
-        CTemplatePtr tempPtr = GetTemplate(tid);
-        if (tempPtr != nullptr)
+        CTemplatePtr templatePtr = GetTemplate(tid);
+        if (templatePtr != nullptr)
         {
-            CTemplatePost* post = dynamic_cast<CTemplatePost*>(tempPtr.get());
+            auto post = boost::dynamic_pointer_cast<CTemplatePost>(templatePtr);
             if (post->m_total != tx.nAmount)
             {
                 return false;

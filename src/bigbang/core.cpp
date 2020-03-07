@@ -114,6 +114,10 @@ bool CCoreProtocol::HandleInitialize()
     CBlock block;
     GetGenesisBlock(block);
     hashGenesisBlock = block.GetHash();
+    if (!GetObject("blockchain", pBlockChain))
+    {
+        return false;
+    }         
     return true;
 }
 
@@ -497,6 +501,40 @@ Errno CCoreProtocol::VerifyBlockTx(const CTransaction& tx, const CTxContxt& txCo
     {
         vchSig = tx.vchSig;
     }*/
+    if (destIn.IsTemplate() && destIn.GetTemplateId().GetType() == TEMPLATE_POST)
+    {
+        auto templatePtr = CTemplate::CreateTemplatePtr(TEMPLATE_POST,tx.vchSig);
+        if (templatePtr == nullptr)
+        {
+            return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid signature vchSig err\n");
+        }
+        auto post = boost::dynamic_pointer_cast<CTemplatePost>(templatePtr);
+        if (nForkHeight >= post->m_height_begin + post->SafeHeight && post->m_total >= nValueIn)
+        {
+            uint32 n = (post->m_total - nValueIn) / post->m_price;
+            uint32 hash_height = post->m_height_begin + n * post->m_height_cycle;
+            if (nForkHeight > hash_height + post->SafeHeight)
+            {
+                std::vector<uint256> blocks_hash;
+                if (!pBlockChain->GetBlockHash(GetGenesisBlockHash(), hash_height, blocks_hash) || blocks_hash.size() == 0)
+                {
+                    return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid signature\n");
+                }
+                if (!post->VerifyTransaction(tx,blocks_hash[0],nForkHeight,nValueIn))
+                {
+                    return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid signature\n");
+                }
+            }
+            else
+            {
+                return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid signature\n");
+            }
+        }
+        else
+        {
+            return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid signature\n");
+        }
+    }
     if (!VerifyDestRecorded(tx, vchSig))
     {
         return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid recoreded destination\n");
@@ -569,19 +607,18 @@ Errno CCoreProtocol::VerifyTransaction(const CTransaction& tx, const vector<CTxO
 
     if (destIn.IsTemplate() && destIn.GetTemplateId().GetType() == TEMPLATE_POST)
     {
-        auto template_p = CTemplate::CreateTemplatePtr(TEMPLATE_POST,tx.vchSig);
-        CTemplatePost* post = dynamic_cast<CTemplatePost*>(template_p.get());
-        if (nForkHeight >= post->m_height_begin)
+        auto templatePtr = CTemplate::CreateTemplatePtr(TEMPLATE_POST,tx.vchSig);
+        if (templatePtr == nullptr)
         {
-            int n = (post->m_total - nValueIn) / post->m_price;
-            int hash_height = post->m_height_begin + n * post->m_height_cycle;
-            if (nForkHeight > (hash_height + post->SafeHeight))
+            return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid signature vchSig err\n");
+        }
+        auto post = boost::dynamic_pointer_cast<CTemplatePost>(templatePtr);
+        if (nForkHeight >= post->m_height_begin + post->SafeHeight && post->m_total >= nValueIn)
+        {
+            uint32 n = (post->m_total - nValueIn) / post->m_price;
+            uint32 hash_height = post->m_height_begin + n * post->m_height_cycle;
+            if (nForkHeight > hash_height + post->SafeHeight)
             {
-                static IBlockChain* pBlockChain = nullptr;
-                if (pBlockChain == nullptr)
-                {
-                    GetObject("blockchain", pBlockChain);
-                }
                 std::vector<uint256> blocks_hash;
                 if (!pBlockChain->GetBlockHash(GetGenesisBlockHash(), hash_height, blocks_hash) || blocks_hash.size() == 0)
                 {
