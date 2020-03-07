@@ -32,8 +32,6 @@ public:
                                   const std::vector<uint8>& vchPreSig,
                                   std::vector<uint8>& vchSig) const;
 
-    bool VerifySignature(const uint256& hash, const std::vector<uint8>& vchSig, int height, const uint256& fork);
-
     bool VerifyTransaction(const CTransaction& tx,
                             uint256 &block_hash,
                             uint32 height,
@@ -56,7 +54,8 @@ public:
     uint64 m_total;
     uint64 m_price;
     uint8 m_post_base[40];
-    static const int DataLen = sizeof(m_business) + sizeof(m_customer) + sizeof(m_height_begin) + sizeof(m_height_cycle) + sizeof(m_total) + sizeof(m_price) + sizeof(m_post_base);
+    static const uint32 SafeHeight = 5;
+    static const uint32 DataLen = sizeof(m_business) + sizeof(m_customer) + sizeof(m_height_begin) + sizeof(m_height_cycle) + sizeof(m_total) + sizeof(m_price) + sizeof(m_post_base);
 };
 
 #endif

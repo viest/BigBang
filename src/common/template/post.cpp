@@ -78,7 +78,7 @@ const CTemplatePostPtr CTemplatePost::CreateTemplatePtr(CTemplatePost* ptr)
 
 bool CTemplatePost::ValidateParam() const
 {
-    if (m_height_cycle <= 30)
+    if (m_height_cycle <= SafeHeight)
     {
         return false;
     }
@@ -152,7 +152,7 @@ void CTemplatePost::BuildTemplateData()
 bool CTemplatePost::VerifyTxSignature(const uint256& hash, const uint256& hashAnchor, const CDestination& destTo,
                                           const vector<uint8>& vchSig, const int32 nForkHeight, bool& fCompleted) const
 {
-    uint32 height_max = (m_height_begin + (m_total / m_price) * m_height_cycle);
+    uint32 height_max = SafeHeight + m_height_begin + ((m_total / m_price) + 1) * m_height_cycle;
     if (nForkHeight >= height_max)
     {
         if (m_customer.GetPubKey().Verify(hash, vchSig))
@@ -191,7 +191,7 @@ bool CTemplatePost::GetSignDestination(const CTransaction& tx, const std::vector
         return false;
     }
     setSubDest.clear();
-    uint32 height_max = (m_height_begin + (m_total / m_price) * m_height_cycle);
+    uint32 height_max = SafeHeight + m_height_begin + ((m_total / m_price) + 1) * m_height_cycle;
     if (height >= height_max)
     {
         setSubDest.insert(m_customer);
@@ -214,7 +214,12 @@ bool CTemplatePost::BuildTxSignature(const uint256& hash,
 }
 
 bool CTemplatePost::VerifyTransaction(const CTransaction& tx,uint256 &block_hash,uint32 height,uint64 nValueIn)
-{	
+{
+    uint32 height_max = SafeHeight + m_height_begin + ((m_total / m_price) + 1) * m_height_cycle;
+    if (height >= height_max)
+    {
+        return true;
+    }
     if ((tx.nAmount + tx.nTxFee) != m_price)
     {
         return false;
@@ -223,18 +228,12 @@ bool CTemplatePost::VerifyTransaction(const CTransaction& tx,uint256 &block_hash
     {
         return false;
     }
-    uint64 surplus = m_total -  m_price * (height - m_height_begin) / m_height_cycle;
-    if (nValueIn < surplus)
-    {
-        return false;
-    }
     if (tx.vchData.size() != 545)
     {
         return false;
     }
-
-    uint8_t bufrandomness[] = {9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	//uint8_t *randomness = (uint8_t*)(&(block_hash[0]));
+    //uint8_t bufrandomness[] = {9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	uint8_t *bufrandomness = (uint8_t*)(&(block_hash[0]));
     std::vector<uint8> result = tx.vchData;
     result.erase(result.begin() + 20);
     
@@ -261,39 +260,4 @@ bool CTemplatePost::VerifyTransaction(const CTransaction& tx,uint256 &block_hash
     bool res = resp->is_valid;
     destroy_verify_post_response(resp);
     return res;
-}
-
-bool CTemplatePost::VerifySignature(const uint256& hash, const std::vector<uint8>& vchSig, int height, const uint256& fork)
-{
-    std::vector<unsigned char> temp;
-    temp.assign(vchSig.begin() + DataLen, vchSig.end());
-    CIDataStream is(temp);
-    std::vector<unsigned char> post_data;
-    std::vector<unsigned char> sign;
-    try
-    {
-        is >> post_data >> sign;
-    }
-    catch (const std::exception& e)
-    {
-        StdError(__PRETTY_FUNCTION__, e.what());
-        return false;
-    }
-    if (!memcmp(post_data.data(),m_post_base,sizeof(m_post_base)))
-    {
-        return false;
-    }
-    uint32 height_max = (m_height_begin + (m_total / m_price) * m_height_cycle);
-    if (height >= height_max)
-    {
-        return m_customer.GetPubKey().Verify(hash, sign);
-    }
-    else if (height >= m_height_begin)
-    {
-        return m_business.GetPubKey().Verify(hash, sign);
-    }
-    else
-    {
-        return false;
-    }
 }

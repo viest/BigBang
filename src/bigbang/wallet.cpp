@@ -10,6 +10,7 @@
 #include "template/delegate.h"
 #include "template/mint.h"
 #include "template/vote.h"
+#include "template/post.h"
 
 using namespace std;
 using namespace xengine;
@@ -574,6 +575,22 @@ bool CWallet::SignTransaction(const CDestination& destIn, CTransaction& tx, cons
             return false;
         }
         fDestInRecorded = true;
+    }
+    if (tx.sendTo.GetTemplateId(tid) && tid.GetType() == TEMPLATE_POST)
+    {
+        CTemplatePtr tempPtr = GetTemplate(tid);
+        if (tempPtr != nullptr)
+        {
+            CTemplatePost* post = dynamic_cast<CTemplatePost*>(tempPtr.get());
+            if (post->m_total != tx.nAmount)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
     /*bool fDestInRecorded = CTemplate::IsDestInRecorded(tx.sendTo);
     if (!tx.vchSig.empty())

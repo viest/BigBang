@@ -573,18 +573,26 @@ Errno CCoreProtocol::VerifyTransaction(const CTransaction& tx, const vector<CTxO
         CTemplatePost* post = dynamic_cast<CTemplatePost*>(template_p.get());
         if (nForkHeight >= post->m_height_begin)
         {
-            static IBlockChain* pBlockChain = nullptr;
-            if (pBlockChain == nullptr)
+            int n = (post->m_total - nValueIn) / post->m_price;
+            int hash_height = post->m_height_begin + n * post->m_height_cycle;
+            if (nForkHeight > (hash_height + post->SafeHeight))
             {
-                GetObject("blockchain", pBlockChain);
+                static IBlockChain* pBlockChain = nullptr;
+                if (pBlockChain == nullptr)
+                {
+                    GetObject("blockchain", pBlockChain);
+                }
+                std::vector<uint256> blocks_hash;
+                if (!pBlockChain->GetBlockHash(GetGenesisBlockHash(), hash_height, blocks_hash) || blocks_hash.size() == 0)
+                {
+                    return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid signature\n");
+                }
+                if (!post->VerifyTransaction(tx,blocks_hash[0],nForkHeight,nValueIn))
+                {
+                    return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid signature\n");
+                }
             }
-            int hash_height = nForkHeight - ((nForkHeight - post->m_height_begin) % post->m_height_cycle);
-            std::vector<uint256> blocks_hash;
-            if (!pBlockChain->GetBlockHash(GetGenesisBlockHash(), hash_height, blocks_hash))
-            {
-                return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid signature\n");
-            }
-            if (!post->VerifyTransaction(tx,blocks_hash[0],nForkHeight,nValueIn))
+            else
             {
                 return DEBUG(ERR_TRANSACTION_SIGNATURE_INVALID, "invalid signature\n");
             }
