@@ -47,33 +47,14 @@ set(curve25519
 )
 
 set(sources
-    uint256.h
     crc24q.cpp      crc24q.h
-    base32.cpp      base32.h
     crypto.cpp      crypto.h
-    key.cpp         key.h
-    keystore.cpp    keystore.h
-    ${curve25519}
-    ${pow_hash}
+    base32.cpp      base32.h
 )
 
-set(CMAKE_C_FLAGS "-msse2 -maes")
 
-add_library(crypto ${sources})
+set(CMAKE_CXX_FLAGS "-fPIC")
+
+add_library(crypto SHARED ${sources})
 
 include_directories(../xengine ../common ./ ${sodium_INCLUDE_DIR})
-
-target_link_libraries(crypto
-    ${Boost_SYSTEM_LIBRARY}
-    ${Boost_FILESYSTEM_LIBRARY}
-    ${Boost_PROGRAM_OPTIONS_LIBRARY}
-    ${Boost_THREAD_LIBRARY}
-    ${CMAKE_THREAD_LIBS_INIT}
-    ${Boost_DATE_TIME_LIBRARY}
-    ${Boost_REGEX_LIBRARY}
-    OpenSSL::SSL
-    OpenSSL::Crypto
-    ${sodium_LIBRARY_RELEASE}
-    xengine
-    common
-)
