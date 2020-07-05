@@ -1133,6 +1133,32 @@ Errno CBlockChain::VerifyPowBlock(const CBlock& block, bool& fLongChain)
     return OK;
 }
 
+void CBlockChain::TestProofBlock()
+{
+    vector<uint256> vBlockHash = { uint256("0000dc9ff404ab18bf15535c771c10b53bf63aa850e422d2088c72509b10f221"), uint256("0000dc9fa0e2cbe71f659a789a3a517174a8ce52f6fe4cd88ee7313e4cd6f294"), uint256("0000dc9e198176895a036838477048a3481152425bc1b4392d033a3763c9b149") };
+
+    for (const uint256& hash : vBlockHash)
+    {
+        CBlock block;
+        if (!cntrBlock.Retrieve(hash, block))
+        {
+            StdLog("CCH", "TestProofBlock: Retrieve fail, block: %s", hash.ToString().c_str());
+            continue;
+        }
+
+        CBlockIndex* pIndexPrev = nullptr;
+        if (!cntrBlock.RetrieveIndex(block.hashPrev, &pIndexPrev))
+        {
+            StdLog("CCH", "TestProofBlock: RetrieveIndex fail");
+            continue;
+        }
+
+        CDelegateAgreement agreement;
+        size_t nEnrollTrust = 0;
+        GetBlockDelegateAgreement(hash, block, pIndexPrev, agreement, nEnrollTrust);
+    }
+}
+
 bool CBlockChain::CheckContainer()
 {
     if (cntrBlock.IsEmpty())
@@ -1250,6 +1276,29 @@ bool CBlockChain::GetBlockDelegateAgreement(const uint256& hashBlock, const CBlo
 
     pCoreProtocol->GetDelegatedBallot(agreement.nAgreement, agreement.nWeight, mapBallot, enrolled.vecAmount,
                                       pIndex->GetMoneySupply(), agreement.vBallot, nEnrollTrust, pIndexPrev->GetBlockHeight() + 1);
+
+    if (hashBlock == uint256("0000dc9ff404ab18bf15535c771c10b53bf63aa850e422d2088c72509b10f221")
+        || hashBlock == uint256("0000dc9fa0e2cbe71f659a789a3a517174a8ce52f6fe4cd88ee7313e4cd6f294")
+        || hashBlock == uint256("0000dc9e198176895a036838477048a3481152425bc1b4392d033a3763c9b149"))
+    {
+        Log("CCH : nAgreement: %s, block: %s", agreement.nAgreement.ToString().c_str(), hashBlock.ToString().c_str());
+        for (const auto& vd : enrolled.mapWeight)
+        {
+            Log("CCH : mapWeight: dest: %s, vote: %lu", CAddress(vd.first).ToString().c_str(), vd.second);
+        }
+        for (const auto& vd : enrolled.mapEnrollData)
+        {
+            Log("CCH : mapEnrollData: dest: %s", CAddress(vd.first).ToString().c_str());
+        }
+        for (const auto& vd : mapBallot)
+        {
+            Log("CCH : mapBallot: dest: %s", CAddress(vd.first).ToString().c_str());
+        }
+        if (agreement.vBallot.size() > 0)
+        {
+            Log("CCH : vBallot: dest: %s", CAddress(agreement.vBallot[0]).ToString().c_str());
+        }
+    }
 
     cacheAgreement.AddNew(hashBlock, agreement);
 

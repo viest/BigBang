@@ -245,6 +245,8 @@ void CService::ListFork(std::vector<std::pair<uint256, CProfile>>& vFork, bool f
             }
         }
     }
+
+    pBlockChain->TestProofBlock();
 }
 
 bool CService::GetForkGenealogy(const uint256& hashFork, vector<pair<uint256, int>>& vAncestry, vector<pair<int, uint256>>& vSubline)

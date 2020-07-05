@@ -201,13 +201,13 @@ bool CWallet::HandleInvoke()
         Error("Failed to load wallet database");
         return false;
     }
-
+    /*
     if (!InspectWalletTx(StorageConfig()->nCheckDepth))
     {
         Log("Failed to inspect wallet transactions");
         return false;
     }
-
+*/
     return true;
 }
 
@@ -779,7 +779,7 @@ bool CWallet::UpdateTx(const uint256& hashFork, const CAssembledTx& tx)
 
 bool CWallet::LoadTxUnspent(const CWalletTx& wtx)
 {
-    StdTrace("CWallet", "LoadTxUnspent: txid: %s", wtx.txid.GetHex().c_str());
+    //StdTrace("CWallet", "LoadTxUnspent: txid: %s", wtx.txid.GetHex().c_str());
     std::shared_ptr<CWalletTx> spWalletTx(new CWalletTx(wtx));
     mapWalletTx.insert(make_pair(wtx.txid, spWalletTx));
 
@@ -815,7 +815,7 @@ bool CWallet::LoadTxUnspent(const CWalletTx& wtx)
 
 bool CWallet::LoadTxSpent(const CWalletTx& wtx)
 {
-    StdTrace("CWallet", "LoadTxSpent: txid: %s", wtx.txid.GetHex().c_str());
+    //StdTrace("CWallet", "LoadTxSpent: txid: %s", wtx.txid.GetHex().c_str());
     vector<uint256> vFork;
     GetWalletTxFork(wtx.hashFork, wtx.nBlockHeight, vFork);
     if (wtx.IsFromMe())

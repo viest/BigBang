@@ -940,6 +940,46 @@ bool CCheckBlockWalker::Initialize(const string& strPath)
 
 bool CCheckBlockWalker::Walk(const CBlockEx& block, uint32 nFile, uint32 nOffset)
 {
+    /*const uint256 hashBlock = block.GetHash();
+    if (hashBlock == uint256("0000dc9ff404ab18bf15535c771c10b53bf63aa850e422d2088c72509b10f221")
+        || hashBlock == uint256("0000dc9fa0e2cbe71f659a789a3a517174a8ce52f6fe4cd88ee7313e4cd6f294")
+        || hashBlock == uint256("0000dc9e198176895a036838477048a3481152425bc1b4392d033a3763c9b149"))
+    {
+        StdLog("CCH", "block: %s, proof hex: %s", hashBlock.GetHex().c_str(), ToHexString(block.vchProof).c_str());
+
+        static map<uint256, vector<unsigned char>> mapBlockProof;
+        if (mapBlockProof.count(hashBlock) == 0)
+        {
+            mapBlockProof.insert(make_pair(hashBlock, block.vchProof));
+        }
+        if (hashBlock == uint256("0000dc9ff404ab18bf15535c771c10b53bf63aa850e422d2088c72509b10f221"))
+        {
+            auto it = mapBlockProof.find(uint256("0000dc9e198176895a036838477048a3481152425bc1b4392d033a3763c9b149"));
+            if (it != mapBlockProof.end())
+            {
+                if (block.vchProof.size() != it->second.size())
+                {
+                    StdLog("CCH", "prev block proof size != ,");
+                }
+                else
+                {
+                    for (size_t i = 0; i < block.vchProof.size(); i++)
+                    {
+                        if (block.vchProof[i] != it->second[i])
+                        {
+                            StdLog("CCH", "prev block proof data != ");
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                StdLog("CCH", "not find prev block");
+            }
+        }
+    }*/
+
     const uint256 hashBlock = block.GetHash();
     if (mapBlock.count(hashBlock) > 0)
     {
@@ -1284,6 +1324,32 @@ bool CCheckBlockWalker::GetBlockDelegateAgreement(const uint256& hashBlock, cons
         return false;
     }
 
+    /*if (hashBlock == uint256("0000dc9ff404ab18bf15535c771c10b53bf63aa850e422d2088c72509b10f221")
+        || hashBlock == uint256("0000dc9fa0e2cbe71f659a789a3a517174a8ce52f6fe4cd88ee7313e4cd6f294")
+        || hashBlock == uint256("0000dc9e198176895a036838477048a3481152425bc1b4392d033a3763c9b149"))
+    {
+        GetDelegatedBallot(agreement.nAgreement, agreement.nWeight, mapBallot, enrolled.vecAmount,
+                           pIndex->GetMoneySupply(), agreement.vBallot, nEnrollTrust, pIndexPrev->GetBlockHeight() + 1);
+
+        StdLog("CCH : nAgreement: %s, block: %s", agreement.nAgreement.ToString().c_str(), hashBlock.ToString().c_str());
+        for (const auto& vd : enrolled.mapWeight)
+        {
+            StdLog("CCH : mapWeight: dest: %s, vote: %lu", CAddress(vd.first).ToString().c_str(), vd.second);
+        }
+        for (const auto& vd : enrolled.mapEnrollData)
+        {
+            StdLog("CCH : mapEnrollData: dest: %s", CAddress(vd.first).ToString().c_str());
+        }
+        for (const auto& vd : mapBallot)
+        {
+            StdLog("CCH : mapBallot: dest: %s", CAddress(vd.first).ToString().c_str());
+        }
+        if (agreement.vBallot.size() > 0)
+        {
+            StdLog("CCH : vBallot: dest: %s", CAddress(agreement.vBallot[0]).ToString().c_str());
+        }
+    }*/
+
     nEnrollTrust = 0;
     for (auto& amount : enrolled.vecAmount)
     {
@@ -1294,6 +1360,81 @@ bool CCheckBlockWalker::GetBlockDelegateAgreement(const uint256& hashBlock, cons
     }
     nEnrollTrust /= objProofParam.nDelegateProofOfStakeEnrollMinimumAmount;
     return true;
+}
+
+static const int64 DELEGATE_PROOF_OF_STAKE_ENROLL_MINIMUM_AMOUNT = 10000000 * COIN;
+static const int64 DELEGATE_PROOF_OF_STAKE_ENROLL_MAXIMUM_AMOUNT = 300000000 * COIN;
+static const int64 DELEGATE_PROOF_OF_STATE_ENROLL_MAXIMUM_TOTAL_AMOUNT = 690000000 * COIN;
+static const int64 DELEGATE_PROOF_OF_STAKE_UNIT_AMOUNT = 1000 * COIN;
+static const int64 DELEGATE_PROOF_OF_STAKE_MAXIMUM_TIMES = 1000000 * COIN;
+
+void CCheckBlockWalker::GetDelegatedBallot(const uint256& nAgreement, size_t nWeight, const map<CDestination, size_t>& mapBallot,
+                                           const vector<pair<CDestination, int64>>& vecAmount, int64 nMoneySupply, vector<CDestination>& vBallot, size_t& nEnrollTrust, int nBlockHeight)
+{
+    vBallot.clear();
+    if (nAgreement == 0 || mapBallot.size() == 0)
+    {
+        StdTrace("Core", "Get delegated ballot: height: %d, nAgreement: %s, mapBallot.size: %ld", nBlockHeight, nAgreement.GetHex().c_str(), mapBallot.size());
+        return;
+    }
+    if (nMoneySupply < 0)
+    {
+        StdTrace("Core", "Get delegated ballot: nMoneySupply < 0");
+        return;
+    }
+    if (vecAmount.size() != mapBallot.size())
+    {
+        StdError("Core", "Get delegated ballot: dest ballot size %llu is not equal amount size %llu", mapBallot.size(), vecAmount.size());
+    }
+
+    int nSelected = 0;
+    for (const unsigned char* p = nAgreement.begin(); p != nAgreement.end(); ++p)
+    {
+        nSelected ^= *p;
+    }
+
+    map<CDestination, size_t> mapSelectBallot;
+    size_t nMaxWeight = std::min(nMoneySupply, DELEGATE_PROOF_OF_STATE_ENROLL_MAXIMUM_TOTAL_AMOUNT) / DELEGATE_PROOF_OF_STAKE_UNIT_AMOUNT;
+    size_t nEnrollWeight = 0;
+    nEnrollTrust = 0;
+    for (auto& amount : vecAmount)
+    {
+        StdTrace("Core", "Get delegated ballot: height: %d, vote dest: %s, amount: %lld",
+                 nBlockHeight, CAddress(amount.first).ToString().c_str(), amount.second);
+        if (mapBallot.find(amount.first) != mapBallot.end())
+        {
+            size_t nDestWeight = (size_t)(min(amount.second, DELEGATE_PROOF_OF_STAKE_ENROLL_MAXIMUM_AMOUNT) / DELEGATE_PROOF_OF_STAKE_UNIT_AMOUNT);
+            mapSelectBallot[amount.first] = nDestWeight;
+            nEnrollWeight += nDestWeight;
+            nEnrollTrust += (size_t)(min(amount.second, DELEGATE_PROOF_OF_STAKE_ENROLL_MAXIMUM_AMOUNT));
+            StdTrace("Core", "Get delegated ballot: height: %d, ballot dest: %s, weight: %lld",
+                     nBlockHeight, CAddress(amount.first).ToString().c_str(), nDestWeight);
+        }
+    }
+    nEnrollTrust /= DELEGATE_PROOF_OF_STAKE_ENROLL_MINIMUM_AMOUNT;
+    StdTrace("Core", "Get delegated ballot: trust height: %d, ballot dest count is %llu, enroll trust: %llu", nBlockHeight, mapSelectBallot.size(), nEnrollTrust);
+
+    size_t nWeightWork = ((nMaxWeight - nEnrollWeight) * (nMaxWeight - nEnrollWeight) * (nMaxWeight - nEnrollWeight))
+                         / (nMaxWeight * nMaxWeight);
+    StdTrace("Core", "Get delegated ballot: weight height: %d, nRandomDelegate: %llu, nRandomWork: %llu, nWeightDelegate: %llu, nWeightWork: %llu",
+             nBlockHeight, nSelected, (nWeightWork * 256 / (nWeightWork + nEnrollWeight)), nEnrollWeight, nWeightWork);
+    if (nSelected >= nWeightWork * 256 / (nWeightWork + nEnrollWeight))
+    {
+        size_t total = nEnrollWeight;
+        size_t n = (nSelected * DELEGATE_PROOF_OF_STAKE_MAXIMUM_TIMES) % total;
+        for (map<CDestination, size_t>::const_iterator it = mapSelectBallot.begin(); it != mapSelectBallot.end(); ++it)
+        {
+            if (n < it->second)
+            {
+                vBallot.push_back(it->first);
+                break;
+            }
+            n -= (*it).second;
+        }
+    }
+
+    StdTrace("Core", "Get delegated ballot: height: %d, consensus: %s, ballot dest: %s",
+             nBlockHeight, (vBallot.size() > 0 ? "dpos" : "pow"), (vBallot.size() > 0 ? CAddress(vBallot[0]).ToString().c_str() : ""));
 }
 
 bool CCheckBlockWalker::GetBlockDelegateEnrolled(const uint256& hashBlock, CBlockIndex* pIndex, CDelegateEnrolled& enrolled)
@@ -1730,13 +1871,14 @@ bool CCheckRepairData::FetchBlockData()
     uint32 nLastFileRet = 0;
     uint32 nLastPosRet = 0;
 
-    StdLog("check", "Fetch block and tx......");
+    StdLog("check", "Fetch block and tx: test: 3333......");
     if (!tsBlock.WalkThrough(objBlockWalker, nLastFileRet, nLastPosRet, !fOnlyCheck))
     {
         StdError("check", "Fetch block and tx fail.");
         return false;
     }
     StdLog("check", "Fetch block and tx success, block: %ld.", objBlockWalker.nBlockCount);
+    //return false;
 
     if (objBlockWalker.nBlockCount > 0)
     {

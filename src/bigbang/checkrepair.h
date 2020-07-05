@@ -452,6 +452,9 @@ public:
                                map<CDestination, size_t>& mapWeight, map<CDestination, vector<unsigned char>>& mapEnrollData,
                                vector<pair<CDestination, int64>>& vecAmount);
 
+    void GetDelegatedBallot(const uint256& nAgreement, size_t nWeight, const map<CDestination, size_t>& mapBallot,
+                            const vector<pair<CDestination, int64>>& vecAmount, int64 nMoneySupply, vector<CDestination>& vBallot, size_t& nEnrollTrust, int nBlockHeight);
+
     bool UpdateBlockNext();
     bool UpdateBlockTx(CCheckForkManager& objForkMn);
     bool AddBlockTx(const CTransaction& txIn, const CTxContxt& contxtIn, int nHeight, const uint256& hashAtForkIn, uint32 nFileNoIn, uint32 nOffsetIn, const vector<uint256>& vFork);
