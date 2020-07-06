@@ -940,6 +940,11 @@ bool CCheckBlockWalker::Initialize(const string& strPath)
 
 bool CCheckBlockWalker::Walk(const CBlockEx& block, uint32 nFile, uint32 nOffset)
 {
+    /*if (block.hashPrev == uint256("0000dc9ff404ab18bf15535c771c10b53bf63aa850e422d2088c72509b10f221"))
+    {
+        StdLog("check", "hashPrev=0000dc9ff404ab18bf15535c771c10b53bf63aa850e422d2088c72509b10f221, block: %s", block.GetHash().ToString().c_str());
+    }*/
+
     /*const uint256 hashBlock = block.GetHash();
     if (hashBlock == uint256("0000dc9ff404ab18bf15535c771c10b53bf63aa850e422d2088c72509b10f221")
         || hashBlock == uint256("0000dc9fa0e2cbe71f659a789a3a517174a8ce52f6fe4cd88ee7313e4cd6f294")

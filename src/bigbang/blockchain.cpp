@@ -1281,14 +1281,20 @@ bool CBlockChain::GetBlockDelegateAgreement(const uint256& hashBlock, const CBlo
         || hashBlock == uint256("0000dc9fa0e2cbe71f659a789a3a517174a8ce52f6fe4cd88ee7313e4cd6f294")
         || hashBlock == uint256("0000dc9e198176895a036838477048a3481152425bc1b4392d033a3763c9b149"))
     {
-        Log("CCH : nAgreement: %s, block: %s", agreement.nAgreement.ToString().c_str(), hashBlock.ToString().c_str());
+        Log("CCH : nAgreement: %s, block: %s, hashPrev: %s, Distribute block: %s",
+            agreement.nAgreement.ToString().c_str(),
+            hashBlock.ToString().c_str(),
+            block.hashPrev.ToString().c_str(),
+            pIndex->GetBlockHash().ToString().c_str());
         for (const auto& vd : enrolled.mapWeight)
         {
             Log("CCH : mapWeight: dest: %s, vote: %lu", CAddress(vd.first).ToString().c_str(), vd.second);
         }
         for (const auto& vd : enrolled.mapEnrollData)
         {
-            Log("CCH : mapEnrollData: dest: %s", CAddress(vd.first).ToString().c_str());
+            Log("CCH : mapEnrollData: dest: %s, data: %s",
+                CAddress(vd.first).ToString().c_str(),
+                ToHexString(vd.second).c_str());
         }
         for (const auto& vd : mapBallot)
         {

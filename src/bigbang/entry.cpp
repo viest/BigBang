@@ -183,6 +183,7 @@ bool CBbEntry::Initialize(int argc, char* argv[])
         }
         StdLog("Bigbang", "Check and repair data complete.");
     }
+    //return false;
 
     // docker
     if (!docker.Initialize(config.GetConfig(), &log))

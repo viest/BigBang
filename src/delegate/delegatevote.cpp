@@ -123,6 +123,7 @@ void CDelegateVote::Publish(map<CDestination, vector<unsigned char>>& mapPublish
         {
             CDelegateData delegateData;
             delegate.Publish(delegateData);
+            std::cout << "nIdentFrom: " << delegateData.nIdentFrom.GetHex() << ", nR: " << delegateData.nR.GetHex() << ", nS: " << delegateData.nS.GetHex() << std::endl;
 
             CODataStream os(mapPublishData[(*it).first]);
             os << delegateData;
