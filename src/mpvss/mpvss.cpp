@@ -230,6 +230,7 @@ void CMPSecretShare::Enroll(const vector<CMPCandidate>& vCandidate)
                 // verification success
                 vParticipant[i]->nIndex = nLastIndex;
                 nLastIndex += vParticipant[i]->candidate.nWeight;
+                StdLog("CCH", "mpvss Enroll nIdent: %s, nIndex: %d, nWeight: %d, nLastIndex: %d", vParticipant[i]->candidate.nIdent.ToString().c_str(), vParticipant[i]->nIndex, vParticipant[i]->candidate.nWeight, nLastIndex);
             }
         }
     }
@@ -310,6 +311,7 @@ bool CMPSecretShare::Collect(const uint256& nIdentFrom, const map<uint256, vecto
     {
         return false;
     }
+    StdLog("CCH", "mpvss Collet nIdentFrom: %s, nIndexFrom: %d, nWeightFrom: %d", nIdentFrom.ToString().c_str(), nIndexFrom, nWeightFrom);
 
     vector<tuple<CMPParticipant*, const vector<uint256>*>> vecPartShare;
     vecPartShare.reserve(mapShare.size());
@@ -339,6 +341,7 @@ bool CMPSecretShare::Collect(const uint256& nIdentFrom, const map<uint256, vecto
             return false;
         }
 
+        StdLog("CCH", "mpvss Collet verify: %d", it->second.VerifyShare(nThresh, nIndexFrom, vShare));
         vecPartShare.push_back(make_tuple(&it->second, &vShare));
     }
 

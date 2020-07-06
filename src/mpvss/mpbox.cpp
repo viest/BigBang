@@ -186,6 +186,7 @@ bool CMPSealedBox::VerifyPolynomial(uint32_t nX, const uint256& v)
     {
         return false;
     }
+    StdLog("CCH", "mpvss VerifyPolynomial nX: %d, result: %s, pub result: %s", nX, v.ToString().c_str(), MPEccPubkey(v).ToString().c_str());
     return (vEncryptedShare[nX] == MPEccPubkey(v));
 }
 
@@ -207,5 +208,10 @@ void CMPSealedBox::PrecalcPolynomial(size_t nThresh, size_t nLastIndex)
             P += vP[i].ScalarMult(CSC25519::naturalPowTable[nX - 1][i - 1]);
         }
         P.Pack(vEncryptedShare[nX].begin());
+    }
+
+    for (int i = 0; i < vEncryptedShare.size(); i++)
+    {
+        StdLog("CCH", "mpvss PrecalcPolynomial vEncryptedShare i: %d, number: %s", i, vEncryptedShare[i].ToString().c_str());
     }
 }

@@ -1286,6 +1286,7 @@ bool CBlockChain::GetBlockDelegateAgreement(const uint256& hashBlock, const CBlo
             hashBlock.ToString().c_str(),
             block.hashPrev.ToString().c_str(),
             pIndex->GetBlockHash().ToString().c_str());
+        Log("CCH : block.vchProof: %s", ToHexString(block.vchProof).c_str());
         for (const auto& vd : enrolled.mapWeight)
         {
             Log("CCH : mapWeight: dest: %s, vote: %lu", CAddress(vd.first).ToString().c_str(), vd.second);

@@ -263,6 +263,7 @@ void CDelegateVote::GetAgreement(uint256& nAgreement, size_t& nWeight, map<CDest
         for (map<uint256, pair<uint256, size_t>>::iterator it = mapSecret.begin();
              it != mapSecret.end(); ++it)
         {
+            StdLog("CCH", "Reconstruct dest: %s, weight: %d, result: %s", it->first.ToString().c_str(), it->second.second, it->second.first.ToString().c_str());
             os << (*it).second.first;
             nWeight += (*it).second.second;
             mapBallot.insert(make_pair(DestFromIdentUInt256((*it).first), (*it).second.second));
