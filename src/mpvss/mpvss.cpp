@@ -61,7 +61,7 @@ bool CMPParticipant::VerifyShare(size_t nThresh, size_t nIndexIn, const vector<u
     return true;
 }
 
-void CMPParticipant::PrepareVerification(std::size_t nThresh, std::size_t nLastIndex)
+void CMPParticipant::PrepareVerification(size_t nThresh, size_t nLastIndex)
 {
     candidate.sBox.PrecalcPolynomial(nThresh, nLastIndex);
 }
@@ -256,7 +256,7 @@ void CMPSecretShare::Distribute(map<uint256, vector<uint256>>& mapShare)
 
     computer.Transform(
         vecParticipant.size(),
-        std::bind(&LoadVectorData<CMPParticipant*>, cref(vecParticipant), placeholders::_1),
+        bind(&LoadVectorData<CMPParticipant*>, cref(vecParticipant), placeholders::_1),
         [&](size_t nIndex, const vector<uint256>& vShare) {
             *vecShare[nIndex] = vShare;
         },
@@ -341,7 +341,6 @@ bool CMPSecretShare::Collect(const uint256& nIdentFrom, const map<uint256, vecto
             return false;
         }
 
-        StdLog("CCH", "mpvss Collet verify: %d", it->second.VerifyShare(nThresh, nIndexFrom, vShare));
         vecPartShare.push_back(make_tuple(&it->second, &vShare));
     }
 
@@ -359,7 +358,11 @@ bool CMPSecretShare::Collect(const uint256& nIdentFrom, const map<uint256, vecto
         vector<pair<uint32_t, uint256>>& vOpenedShare = mapOpenedShare[(*mi).first];
         for (size_t i = 0; i < nWeightFrom && vOpenedShare.size() < nThresh; i++)
         {
-            vOpenedShare.push_back(make_pair(nIndexFrom + i, (*mi).second[i]));
+            pair<uint32_t, uint256> share = make_pair(nIndexFrom + i, (*mi).second[i]);
+            if (find(vOpenedShare.begin(), vOpenedShare.end(), share) == vOpenedShare.end())
+            {
+                vOpenedShare.push_back(move(share));
+            }
         }
         if (vOpenedShare.size() == nThresh)
         {
@@ -372,14 +375,14 @@ bool CMPSecretShare::Collect(const uint256& nIdentFrom, const map<uint256, vecto
 
 void CMPSecretShare::Reconstruct(map<uint256, pair<uint256, size_t>>& mapSecret)
 {
-    using ShareType = tuple<const uint256*, std::vector<std::pair<uint32_t, uint256>>*>;
+    using ShareType = tuple<const uint256*, vector<pair<uint32_t, uint256>>>;
     vector<ShareType> vOpenedShare;
     vOpenedShare.reserve(mapOpenedShare.size());
 
-    map<uint256, vector<pair<uint32_t, uint256>>>::iterator it;
-    for (it = mapOpenedShare.begin(); it != mapOpenedShare.end(); ++it)
+    for (auto it = mapOpenedShare.begin(); it != mapOpenedShare.end(); ++it)
     {
-        vOpenedShare.push_back(ShareType(&it->first, &it->second));
+        vector<pair<uint32_t, uint256>> v(it->second.begin(), it->second.end());
+        vOpenedShare.push_back(ShareType(&it->first, move(v)));
     }
 
     // parallel compute
@@ -387,14 +390,14 @@ void CMPSecretShare::Reconstruct(map<uint256, pair<uint256, size_t>>& mapSecret)
     vector<DataType> vData(vOpenedShare.size());
 
     computer.Transform(vOpenedShare.begin(), vOpenedShare.end(), vData.begin(),
-                       [&](const uint256* pIdent, std::vector<std::pair<uint32_t, uint256>>* pShare) {
-                           if (pShare->size() == nThresh)
+                       [&](const uint256* pIdent, vector<pair<uint32_t, uint256>> vShare) {
+                           if (vShare.size() == nThresh)
                            {
                                const uint256& nIdentAvail = *pIdent;
                                size_t nIndexRet, nWeightRet;
                                if (GetParticipantRange(nIdentAvail, nIndexRet, nWeightRet))
                                {
-                                   return make_pair(MPNewton(*pShare), nWeightRet);
+                                   return make_pair(MPNewton(vShare), nWeightRet);
                                }
                            }
                            return make_pair(uint256(uint64(0)), (size_t)0);

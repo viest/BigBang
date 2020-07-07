@@ -40,7 +40,7 @@ bool CDelegateVerify::VerifyProof(const vector<unsigned char>& vchProof, uint256
                nWeightParse, nAgreementParse.ToString().c_str(), vPublish.size());
         for (int i = 0; i < vPublish.size(); i++)
         {
-            const CDelegateData& delegateData = vPublish[i];
+            CDelegateData& delegateData = vPublish[i];
             vector<unsigned char> vOutData;
             {
                 CODataStream os(vOutData);

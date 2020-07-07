@@ -4,6 +4,7 @@
 
 #include "mpvss.h"
 
+#include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 #include <map>
 #include <vector>
@@ -21,6 +22,7 @@ using namespace xengine;
 using namespace bigbang;
 using namespace bigbang::crypto;
 using namespace std;
+using namespace boost::filesystem;
 
 BOOST_FIXTURE_TEST_SUITE(mpvss_tests, BasicUtfSetup)
 
@@ -355,6 +357,10 @@ BOOST_AUTO_TEST_CASE(mpvss)
 
 BOOST_AUTO_TEST_CASE(bug)
 {
+    path datadir = absolute(boost::unit_test::framework::master_test_suite().argv[0]).parent_path() / ".bigbang";
+    remove_all(datadir);
+    InitLog(datadir, true, false, 1, 1);
+
     map<CDestination, size_t> mapWeight = {
         { CAddress("20m024kcanmkw49ef4v4tvy607d4md196eyg3tz1apagk0tr24n1jzcnn"), 1 },
         { CAddress("20m0d0p9gaynwq6k815kj4n8w8ttydcf80m67sjcp3zsjymjfb7162307"), 1 },
@@ -367,7 +373,6 @@ BOOST_AUTO_TEST_CASE(bug)
     };
 
     // 0000dc9ff404ab18bf15535c771c10b53bf63aa850e422d2088c72509b10f221
-    do
     {
         delegate::CDelegateVerify verifier(mapWeight, mapEnrollData);
 
@@ -377,10 +382,9 @@ BOOST_AUTO_TEST_CASE(bug)
         size_t nWeight;
         BOOST_CHECK(verifier.VerifyProof(vchProof, nAgreement, nWeight, mapBallot));
         cout << "nAgreement: " << nAgreement.ToString() << endl;
-    } while (false);
+    }
 
     // 0000dc9fa0e2cbe71f659a789a3a517174a8ce52f6fe4cd88ee7313e4cd6f294
-    do
     {
         delegate::CDelegateVerify verifier(mapWeight, mapEnrollData);
 
@@ -388,9 +392,11 @@ BOOST_AUTO_TEST_CASE(bug)
         map<CDestination, size_t> mapBallot;
         uint256 nAgreement;
         size_t nWeight;
-        BOOST_CHECK(verifier.VerifyProof(vchProof, nAgreement, nWeight, mapBallot));
+        BOOST_CHECK(!verifier.VerifyProof(vchProof, nAgreement, nWeight, mapBallot));
         cout << "nAgreement: " << nAgreement.ToString() << endl;
-    } while (false);
+    }
+
+    remove_all(datadir);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
