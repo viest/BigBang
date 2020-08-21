@@ -1,0 +1,2 @@
+/usr/bin/ar qc libmpvss.a  CMakeFiles/mpvss.dir/mpbox.cpp.o CMakeFiles/mpvss.dir/mpinterpolation.cpp.o CMakeFiles/mpvss.dir/mpvss.cpp.o
+/usr/bin/ranlib libmpvss.a

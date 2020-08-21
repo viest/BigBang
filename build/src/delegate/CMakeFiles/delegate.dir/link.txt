@@ -1,0 +1,2 @@
+/usr/bin/ar qc libdelegate.a  CMakeFiles/delegate.dir/delegatevote.cpp.o CMakeFiles/delegate.dir/delegate.cpp.o CMakeFiles/delegate.dir/delegateverify.cpp.o
+/usr/bin/ranlib libdelegate.a

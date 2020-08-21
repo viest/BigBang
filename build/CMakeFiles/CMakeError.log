@@ -1,0 +1,340 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_8c1e7/fast"
+/usr/bin/make -f CMakeFiles/cmTC_8c1e7.dir/build.make CMakeFiles/cmTC_8c1e7.dir/build
+make[1]: Entering directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_8c1e7.dir/CheckSymbolExists.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_8c1e7.dir/CheckSymbolExists.c.o   -c /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_8c1e7
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8c1e7.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_8c1e7.dir/CheckSymbolExists.c.o  -o cmTC_8c1e7 
+CMakeFiles/cmTC_8c1e7.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x16): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_8c1e7.dir/build.make:97: recipe for target 'cmTC_8c1e7' failed
+make[1]: *** [cmTC_8c1e7] Error 1
+make[1]: Leaving directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_8c1e7/fast' failed
+make: *** [cmTC_8c1e7/fast] Error 2
+
+File /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_e2a8d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_e2a8d.dir/build.make CMakeFiles/cmTC_e2a8d.dir/build
+make[1]: Entering directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e2a8d.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_e2a8d.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_e2a8d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e2a8d.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_e2a8d.dir/CheckFunctionExists.c.o  -o cmTC_e2a8d -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_e2a8d.dir/build.make:97: recipe for target 'cmTC_e2a8d' failed
+make[1]: *** [cmTC_e2a8d] Error 1
+make[1]: Leaving directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_e2a8d/fast' failed
+make: *** [cmTC_e2a8d/fast] Error 2
+
+
+Determining if the system is big endian passed with the following output:
+Change Dir: /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_2364e/fast"
+/usr/bin/make -f CMakeFiles/cmTC_2364e.dir/build.make CMakeFiles/cmTC_2364e.dir/build
+make[1]: Entering directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_2364e.dir/TestEndianess.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_2364e.dir/TestEndianess.c.o   -c /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp/TestEndianess.c
+Linking C executable cmTC_2364e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2364e.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_2364e.dir/TestEndianess.c.o  -o cmTC_2364e 
+make[1]: Leaving directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+
+TestEndianess.c:
+/* A 16 bit integer is required. */
+typedef unsigned short cmakeint16;
+
+/* On a little endian machine, these 16bit ints will give "THIS IS LITTLE ENDIAN."
+   On a big endian machine the characters will be exchanged pairwise. */
+const cmakeint16 info_little[] =  {0x4854, 0x5349, 0x4920, 0x2053, 0x494c, 0x5454, 0x454c, 0x4520, 0x444e, 0x4149, 0x2e4e, 0x0000};
+
+/* on a big endian machine, these 16bit ints will give "THIS IS BIG ENDIAN."
+   On a little endian machine the characters will be exchanged pairwise. */
+const cmakeint16 info_big[] =     {0x5448, 0x4953, 0x2049, 0x5320, 0x4249, 0x4720, 0x454e, 0x4449, 0x414e, 0x2e2e, 0x0000};
+
+#ifdef __CLASSIC_C__
+int main(argc, argv) int argc; char *argv[];
+#else
+int main(int argc, char *argv[])
+#endif
+{
+  int require = 0;
+  require += info_little[argc];
+  require += info_big[argc];
+  (void)argv;
+  return require;
+}
+
+
+Determining if the function crc32c_value exists in the crc32c failed with the following output:
+Change Dir: /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_a120e/fast"
+/usr/bin/make -f CMakeFiles/cmTC_a120e.dir/build.make CMakeFiles/cmTC_a120e.dir/build
+make[1]: Entering directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a120e.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=crc32c_value   -o CMakeFiles/cmTC_a120e.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_a120e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a120e.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=crc32c_value    CMakeFiles/cmTC_a120e.dir/CheckFunctionExists.c.o  -o cmTC_a120e -lcrc32c 
+/usr/bin/ld: cannot find -lcrc32c
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_a120e.dir/build.make:97: recipe for target 'cmTC_a120e' failed
+make[1]: *** [cmTC_a120e] Error 1
+make[1]: Leaving directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_a120e/fast' failed
+make: *** [cmTC_a120e/fast] Error 2
+
+
+Determining if the function snappy_compress exists in the snappy failed with the following output:
+Change Dir: /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1b362/fast"
+/usr/bin/make -f CMakeFiles/cmTC_1b362.dir/build.make CMakeFiles/cmTC_1b362.dir/build
+make[1]: Entering directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1b362.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=snappy_compress   -o CMakeFiles/cmTC_1b362.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_1b362
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1b362.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=snappy_compress    CMakeFiles/cmTC_1b362.dir/CheckFunctionExists.c.o  -o cmTC_1b362 -lsnappy 
+//usr/local/lib/libsnappy.a(snappy.cc.o): In function `snappy::internal::WorkingMemory::GetHashTable(unsigned long, int*)':
+snappy.cc:(.text+0x151): undefined reference to `operator new[](unsigned long)'
+//usr/local/lib/libsnappy.a(snappy.cc.o): In function `snappy::Compress(snappy::Source*, snappy::Sink*)':
+snappy.cc:(.text+0x18ec): undefined reference to `operator new[](unsigned long)'
+snappy.cc:(.text+0x18fe): undefined reference to `operator new[](unsigned long)'
+snappy.cc:(.text+0x1913): undefined reference to `operator delete[](void*)'
+snappy.cc:(.text+0x191d): undefined reference to `operator delete[](void*)'
+snappy.cc:(.text+0x192f): undefined reference to `operator delete[](void*)'
+snappy.cc:(.text+0x19e6): undefined reference to `operator delete[](void*)'
+//usr/local/lib/libsnappy.a(snappy.cc.o): In function `snappy::Uncompress(char const*, unsigned long, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >*)':
+snappy.cc:(.text+0x1c16): undefined reference to `std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::resize(unsigned long, char)'
+//usr/local/lib/libsnappy.a(snappy.cc.o): In function `snappy::Compress(char const*, unsigned long, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >*)':
+snappy.cc:(.text+0x1ea0): undefined reference to `std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::resize(unsigned long, char)'
+snappy.cc:(.text+0x1ec8): undefined reference to `std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::resize(unsigned long, char)'
+//usr/local/lib/libsnappy.a(snappy.cc.o): In function `snappy::Uncompress(snappy::Source*, snappy::Sink*)':
+snappy.cc:(.text+0x2654): undefined reference to `operator delete(void*)'
+snappy.cc:(.text+0x266f): undefined reference to `operator delete(void*)'
+//usr/local/lib/libsnappy.a(snappy.cc.o): In function `snappy::UncompressAsMuchAsPossible(snappy::Source*, snappy::Sink*)':
+snappy.cc:(.text+0x2af0): undefined reference to `operator delete(void*)'
+snappy.cc:(.text+0x2aff): undefined reference to `operator delete(void*)'
+//usr/local/lib/libsnappy.a(snappy.cc.o): In function `snappy::SnappySinkAllocator::Deleter(void*, char const*, unsigned long)':
+snappy.cc:(.text._ZN6snappy19SnappySinkAllocator7DeleterEPvPKcm[_ZN6snappy19SnappySinkAllocator7DeleterEPvPKcm]+0x9): undefined reference to `operator delete[](void*)'
+//usr/local/lib/libsnappy.a(snappy.cc.o): In function `snappy::SnappyScatteredWriter<snappy::SnappySinkAllocator>::~SnappyScatteredWriter()':
+snappy.cc:(.text._ZN6snappy21SnappyScatteredWriterINS_19SnappySinkAllocatorEED2Ev[_ZN6snappy21SnappyScatteredWriterINS_19SnappySinkAllocatorEED5Ev]+0xe): undefined reference to `operator delete(void*)'
+snappy.cc:(.text._ZN6snappy21SnappyScatteredWriterINS_19SnappySinkAllocatorEED2Ev[_ZN6snappy21SnappyScatteredWriterINS_19SnappySinkAllocatorEED5Ev]+0x1d): undefined reference to `operator delete(void*)'
+//usr/local/lib/libsnappy.a(snappy.cc.o): In function `void std::vector<snappy::SnappySinkAllocator::Datablock, std::allocator<snappy::SnappySinkAllocator::Datablock> >::_M_emplace_back_aux<snappy::SnappySinkAllocator::Datablock const&>(snappy::SnappySinkAllocator::Datablock const&)':
+snappy.cc:(.text._ZNSt6vectorIN6snappy19SnappySinkAllocator9DatablockESaIS2_EE19_M_emplace_back_auxIJRKS2_EEEvDpOT_[_ZNSt6vectorIN6snappy19SnappySinkAllocator9DatablockESaIS2_EE19_M_emplace_back_auxIJRKS2_EEEvDpOT_]+0x43): undefined reference to `operator new(unsigned long)'
+snappy.cc:(.text._ZNSt6vectorIN6snappy19SnappySinkAllocator9DatablockESaIS2_EE19_M_emplace_back_auxIJRKS2_EEEvDpOT_[_ZNSt6vectorIN6snappy19SnappySinkAllocator9DatablockESaIS2_EE19_M_emplace_back_auxIJRKS2_EEEvDpOT_]+0xb6): undefined reference to `operator delete(void*)'
+//usr/local/lib/libsnappy.a(snappy.cc.o): In function `void std::vector<char*, std::allocator<char*> >::_M_emplace_back_aux<char* const&>(char* const&)':
+snappy.cc:(.text._ZNSt6vectorIPcSaIS0_EE19_M_emplace_back_auxIJRKS0_EEEvDpOT_[_ZNSt6vectorIPcSaIS0_EE19_M_emplace_back_auxIJRKS0_EEEvDpOT_]+0x4a): undefined reference to `operator new(unsigned long)'
+snappy.cc:(.text._ZNSt6vectorIPcSaIS0_EE19_M_emplace_back_auxIJRKS0_EEEvDpOT_[_ZNSt6vectorIPcSaIS0_EE19_M_emplace_back_auxIJRKS0_EEEvDpOT_]+0x84): undefined reference to `operator delete(void*)'
+//usr/local/lib/libsnappy.a(snappy.cc.o): In function `snappy::SnappyScatteredWriter<snappy::SnappySinkAllocator>::SlowAppend(char const*, unsigned long)':
+snappy.cc:(.text._ZN6snappy21SnappyScatteredWriterINS_19SnappySinkAllocatorEE10SlowAppendEPKcm[_ZN6snappy21SnappyScatteredWriterINS_19SnappySinkAllocatorEE10SlowAppendEPKcm]+0x100): undefined reference to `operator new[](unsigned long)'
+//usr/local/lib/libsnappy.a(snappy.cc.o):(.eh_frame+0x14f): undefined reference to `__gxx_personality_v0'
+//usr/local/lib/libsnappy.a(snappy-sinksource.cc.o): In function `snappy::ByteArraySource::~ByteArraySource()':
+snappy-sinksource.cc:(.text+0xd1): undefined reference to `operator delete(void*)'
+//usr/local/lib/libsnappy.a(snappy-sinksource.cc.o): In function `snappy::UncheckedByteArraySink::~UncheckedByteArraySink()':
+snappy-sinksource.cc:(.text+0xe1): undefined reference to `operator delete(void*)'
+//usr/local/lib/libsnappy.a(snappy-sinksource.cc.o): In function `snappy::Source::~Source()':
+snappy-sinksource.cc:(.text+0x181): undefined reference to `operator delete(void*)'
+//usr/local/lib/libsnappy.a(snappy-sinksource.cc.o): In function `snappy::Sink::~Sink()':
+snappy-sinksource.cc:(.text+0x1a1): undefined reference to `operator delete(void*)'
+//usr/local/lib/libsnappy.a(snappy-sinksource.cc.o):(.rodata._ZTIN6snappy4SinkE[_ZTIN6snappy4SinkE]+0x0): undefined reference to `vtable for __cxxabiv1::__class_type_info'
+//usr/local/lib/libsnappy.a(snappy-sinksource.cc.o):(.rodata._ZTIN6snappy6SourceE[_ZTIN6snappy6SourceE]+0x0): undefined reference to `vtable for __cxxabiv1::__class_type_info'
+//usr/local/lib/libsnappy.a(snappy-sinksource.cc.o):(.rodata._ZTIN6snappy15ByteArraySourceE[_ZTIN6snappy15ByteArraySourceE]+0x0): undefined reference to `vtable for __cxxabiv1::__si_class_type_info'
+//usr/local/lib/libsnappy.a(snappy-sinksource.cc.o):(.rodata._ZTIN6snappy22UncheckedByteArraySinkE[_ZTIN6snappy22UncheckedByteArraySinkE]+0x0): undefined reference to `vtable for __cxxabiv1::__si_class_type_info'
+//usr/local/lib/libsnappy.a(snappy-sinksource.cc.o):(.rodata._ZTVN6snappy6SourceE[_ZTVN6snappy6SourceE]+0x20): undefined reference to `__cxa_pure_virtual'
+//usr/local/lib/libsnappy.a(snappy-sinksource.cc.o):(.rodata._ZTVN6snappy6SourceE[_ZTVN6snappy6SourceE]+0x28): undefined reference to `__cxa_pure_virtual'
+//usr/local/lib/libsnappy.a(snappy-sinksource.cc.o):(.rodata._ZTVN6snappy6SourceE[_ZTVN6snappy6SourceE]+0x30): undefined reference to `__cxa_pure_virtual'
+//usr/local/lib/libsnappy.a(snappy-sinksource.cc.o):(.rodata._ZTVN6snappy4SinkE[_ZTVN6snappy4SinkE]+0x20): undefined reference to `__cxa_pure_virtual'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_1b362.dir/build.make:97: recipe for target 'cmTC_1b362' failed
+make[1]: *** [cmTC_1b362] Error 1
+make[1]: Leaving directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_1b362/fast' failed
+make: *** [cmTC_1b362/fast] Error 2
+
+
+Determining if the function malloc exists in the tcmalloc failed with the following output:
+Change Dir: /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_31848/fast"
+/usr/bin/make -f CMakeFiles/cmTC_31848.dir/build.make CMakeFiles/cmTC_31848.dir/build
+make[1]: Entering directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_31848.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=malloc   -o CMakeFiles/cmTC_31848.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+<command-line>:0:23: warning: conflicting types for built-in function ‘malloc’
+/usr/share/cmake-3.5/Modules/CheckFunctionExists.c:6:6: note: in expansion of macro ‘CHECK_FUNCTION_EXISTS’
+ char CHECK_FUNCTION_EXISTS();
+      ^
+Linking C executable cmTC_31848
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_31848.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=malloc    CMakeFiles/cmTC_31848.dir/CheckFunctionExists.c.o  -o cmTC_31848 -ltcmalloc 
+/usr/bin/ld: cannot find -ltcmalloc
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_31848.dir/build.make:97: recipe for target 'cmTC_31848' failed
+make[1]: *** [cmTC_31848] Error 1
+make[1]: Leaving directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_31848/fast' failed
+make: *** [cmTC_31848/fast] Error 2
+
+
+Performing C++ SOURCE FILE Test HAVE_CLANG_THREAD_SAFETY failed with the following output:
+Change Dir: /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_16334/fast"
+/usr/bin/make -f CMakeFiles/cmTC_16334.dir/build.make CMakeFiles/cmTC_16334.dir/build
+make[1]: Entering directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_16334.dir/src.cxx.o
+/usr/bin/c++     -O2 -Wall -Wextra -Werror -Wno-char-subscripts -Wno-unused-parameter -Wno-sign-compare -Wno-reorder -Wno-unused-local-typedefs -Wno-implicit-fallthrough -Wno-overloaded-virtual -Wno-strict-aliasing -lrt -DHAVE_CLANG_THREAD_SAFETY -Werror   -o CMakeFiles/cmTC_16334.dir/src.cxx.o -c /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp/src.cxx
+/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp/src.cxx:2:34: error: ‘lockable’ attribute directive ignored [-Werror=attributes]
+ struct __attribute__((lockable)) Lock {
+                                  ^
+/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp/src.cxx:3:59: error: ‘exclusive_lock_function’ attribute directive ignored [-Werror=attributes]
+   void Acquire() __attribute__((exclusive_lock_function()));
+                                                           ^
+/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp/src.cxx:4:51: error: ‘unlock_function’ attribute directive ignored [-Werror=attributes]
+   void Release() __attribute__((unlock_function()));
+                                                   ^
+/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp/src.cxx:8:46: error: ‘guarded_by’ attribute directive ignored [-Werror=attributes]
+   int data_ __attribute__((guarded_by(lock_)));
+                                              ^
+cc1plus: error: unrecognized command line option ‘-Wno-implicit-fallthrough’ [-Werror]
+cc1plus: all warnings being treated as errors
+CMakeFiles/cmTC_16334.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_16334.dir/src.cxx.o' failed
+make[1]: *** [CMakeFiles/cmTC_16334.dir/src.cxx.o] Error 1
+make[1]: Leaving directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_16334/fast' failed
+make: *** [cmTC_16334/fast] Error 2
+
+Source file was:
+
+struct __attribute__((lockable)) Lock {
+  void Acquire() __attribute__((exclusive_lock_function()));
+  void Release() __attribute__((unlock_function()));
+};
+struct ThreadSafeType {
+  Lock lock_;
+  int data_ __attribute__((guarded_by(lock_)));
+};
+int main() { return 0; }
+
+Determining if the system is big endian passed with the following output:
+Change Dir: /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_20045/fast"
+/usr/bin/make -f CMakeFiles/cmTC_20045.dir/build.make CMakeFiles/cmTC_20045.dir/build
+make[1]: Entering directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_20045.dir/TestEndianess.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_20045.dir/TestEndianess.c.o   -c /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp/TestEndianess.c
+Linking C executable cmTC_20045
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_20045.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_20045.dir/TestEndianess.c.o  -o cmTC_20045 -rdynamic 
+make[1]: Leaving directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+
+TestEndianess.c:
+/* A 16 bit integer is required. */
+typedef unsigned short cmakeint16;
+
+/* On a little endian machine, these 16bit ints will give "THIS IS LITTLE ENDIAN."
+   On a big endian machine the characters will be exchanged pairwise. */
+const cmakeint16 info_little[] =  {0x4854, 0x5349, 0x4920, 0x2053, 0x494c, 0x5454, 0x454c, 0x4520, 0x444e, 0x4149, 0x2e4e, 0x0000};
+
+/* on a big endian machine, these 16bit ints will give "THIS IS BIG ENDIAN."
+   On a little endian machine the characters will be exchanged pairwise. */
+const cmakeint16 info_big[] =     {0x5448, 0x4953, 0x2049, 0x5320, 0x4249, 0x4720, 0x454e, 0x4449, 0x414e, 0x2e2e, 0x0000};
+
+#ifdef __CLASSIC_C__
+int main(argc, argv) int argc; char *argv[];
+#else
+int main(int argc, char *argv[])
+#endif
+{
+  int require = 0;
+  require += info_little[argc];
+  require += info_big[argc];
+  (void)argv;
+  return require;
+}
+
+
+Determining if the include file sys/endian.h exists failed with the following output:
+Change Dir: /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_6374e/fast"
+/usr/bin/make -f CMakeFiles/cmTC_6374e.dir/build.make CMakeFiles/cmTC_6374e.dir/build
+make[1]: Entering directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_6374e.dir/CheckIncludeFile.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_6374e.dir/CheckIncludeFile.c.o   -c /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:24: fatal error: sys/endian.h: No such file or directory
+compilation terminated.
+CMakeFiles/cmTC_6374e.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_6374e.dir/CheckIncludeFile.c.o' failed
+make[1]: *** [CMakeFiles/cmTC_6374e.dir/CheckIncludeFile.c.o] Error 1
+make[1]: Leaving directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_6374e/fast' failed
+make: *** [cmTC_6374e/fast] Error 2
+
+
+Determining if the include file windows.h exists failed with the following output:
+Change Dir: /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_ac9d5/fast"
+/usr/bin/make -f CMakeFiles/cmTC_ac9d5.dir/build.make CMakeFiles/cmTC_ac9d5.dir/build
+make[1]: Entering directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ac9d5.dir/CheckIncludeFile.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_ac9d5.dir/CheckIncludeFile.c.o   -c /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:21: fatal error: windows.h: No such file or directory
+compilation terminated.
+CMakeFiles/cmTC_ac9d5.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_ac9d5.dir/CheckIncludeFile.c.o' failed
+make[1]: *** [CMakeFiles/cmTC_ac9d5.dir/CheckIncludeFile.c.o] Error 1
+make[1]: Leaving directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_ac9d5/fast' failed
+make: *** [cmTC_ac9d5/fast] Error 2
+
+
+Determining if the function lzo1x_1_15_compress exists in the lzo2 failed with the following output:
+Change Dir: /home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_2f022/fast"
+/usr/bin/make -f CMakeFiles/cmTC_2f022.dir/build.make CMakeFiles/cmTC_2f022.dir/build
+make[1]: Entering directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_2f022.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=lzo1x_1_15_compress   -o CMakeFiles/cmTC_2f022.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_2f022
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2f022.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=lzo1x_1_15_compress    CMakeFiles/cmTC_2f022.dir/CheckFunctionExists.c.o  -o cmTC_2f022 -rdynamic -llzo2 
+/usr/bin/ld: cannot find -llzo2
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_2f022.dir/build.make:97: recipe for target 'cmTC_2f022' failed
+make[1]: *** [cmTC_2f022] Error 1
+make[1]: Leaving directory '/home/cch/work/bigbang/core/BigBang-fork-create-test/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_2f022/fast' failed
+make: *** [cmTC_2f022/fast] Error 2
+
+
