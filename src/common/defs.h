@@ -7,7 +7,8 @@
 
 //hard fork: change of hash algorithm and its input, and update of template address of multiple signature
 
-#ifdef __cplusplus extern "C"
+#ifdef __cplusplus
+extern "C"
 {
 #endif
     static const int HEIGHT_HASH_MULTI_SIGNER_MAINNET = 78256;
