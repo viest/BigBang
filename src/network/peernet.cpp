@@ -93,6 +93,12 @@ bool CBbPeerNet::HandleEvent(CEventPeerInv& eventInv)
 
 bool CBbPeerNet::HandleEvent(CEventPeerGetData& eventGetData)
 {
+    StdLog(
+        "viest get data", "type: %s, hash: %s",
+           eventGetData.nType == 2 ? "block" : "tx",
+           eventGetData.data[0].nHash.ToString().c_str()
+        );
+
     CBufStream ssPayload;
     ssPayload << eventGetData;
     if (SendDataMessage(eventGetData.nNonce, PROTO_CMD_GETDATA, ssPayload))
@@ -110,6 +116,17 @@ bool CBbPeerNet::HandleEvent(CEventPeerGetData& eventGetData)
 
 bool CBbPeerNet::HandleEvent(CEventPeerGetBlocks& eventGetBlocks)
 {
+//    StdLog("viest", "block: %s", eventGetBlocks.data.vBlockHash[0].ToString().c_str());
+//    StdLog("viest", "block: %s", eventGetBlocks.data.vBlockHash[1].ToString().c_str());
+//    StdLog("viest", "block: %s", eventGetBlocks.data.vBlockHash[2].ToString().c_str());
+//    StdLog("viest", "block: %s", eventGetBlocks.data.vBlockHash[3].ToString().c_str());
+//    StdLog("viest", "block: %s", eventGetBlocks.data.vBlockHash[4].ToString().c_str());
+//    StdLog("viest", "block: %s", eventGetBlocks.data.vBlockHash[5].ToString().c_str());
+//    StdLog("viest", "block: %s", eventGetBlocks.data.vBlockHash[6].ToString().c_str());
+//    StdLog("viest", "block: %s", eventGetBlocks.data.vBlockHash[7].ToString().c_str());
+//    StdLog("viest", "block: %s", eventGetBlocks.data.vBlockHash[8].ToString().c_str());
+//    StdLog("viest", "block: %s", eventGetBlocks.data.vBlockHash[9].ToString().c_str());
+
     CBufStream ssPayload;
     ssPayload << eventGetBlocks;
     return SendDataMessage(eventGetBlocks.nNonce, PROTO_CMD_GETBLOCKS, ssPayload);
@@ -138,6 +155,8 @@ bool CBbPeerNet::HandleEvent(CEventPeerGetFail& eventGetFail)
 
 bool CBbPeerNet::HandleEvent(CEventPeerMsgRsp& eventMsgRsp)
 {
+    StdLog("viest send message", "msg type:%d, msg sub type:%d, rsp:%d", eventMsgRsp.data.nReqMsgType, eventMsgRsp.data.nReqMsgSubType, eventMsgRsp.data.nRspResult);
+
     CBufStream ssPayload;
     ssPayload << eventMsgRsp;
     return SendDataMessage(eventMsgRsp.nNonce, PROTO_CMD_MSGRSP, ssPayload);
@@ -259,6 +278,17 @@ bool CBbPeerNet::SendDataMessage(uint64 nNonce, int nCommand, CBufStream& ssPayl
     {
         return false;
     }
+
+    if (ssPayload.GetSize() == 7753) {
+        StdLog("viest send message peernet", "chn %d, cmd %d, size:%d", PROTO_CHN_DATA, nCommand, ssPayload.GetSize());
+    }
+
+    if (nCommand == PROTO_CMD_GETDATA || nCommand == PROTO_CMD_GETBLOCKS) {
+        StdLog("viest send message peernet", "chn %d, cmd %d, size:%d", PROTO_CHN_DATA, nCommand, ssPayload.GetSize());
+    } else {
+        StdLog("viest send message peernet", "chn %d, cmd %d, size:%d", PROTO_CHN_DATA, nCommand, ssPayload.GetSize());
+    }
+
     return pBbPeer->SendMessage(PROTO_CHN_DATA, nCommand, ssPayload);
 }
 
@@ -399,6 +429,8 @@ bool CBbPeerNet::HandlePeerHandshaked(CPeer* pPeer, uint32 nTimerId)
 
 bool CBbPeerNet::HandlePeerRecvMessage(CPeer* pPeer, int nChannel, int nCommand, CBufStream& ssPayload)
 {
+//    StdLog("viest send message recv", "channel %d, command %d", nChannel, nCommand);
+
     CBbPeer* pBbPeer = static_cast<CBbPeer*>(pPeer);
     if (nChannel == PROTO_CHN_NETWORK)
     {
@@ -535,6 +567,14 @@ bool CBbPeerNet::HandlePeerRecvMessage(CPeer* pPeer, int nChannel, int nCommand,
             if (pEvent != nullptr)
             {
                 ssPayload >> pEvent->data;
+
+//                StdLog("viest block", "hash %s", pEvent->data.vBlockHash[0].ToString().c_str());
+//                StdLog("viest block", "hash %s", pEvent->data.vBlockHash[1].ToString().c_str());
+//                StdLog("viest block", "hash %s", pEvent->data.vBlockHash[2].ToString().c_str());
+//                StdLog("viest block", "hash %s", pEvent->data.vBlockHash[3].ToString().c_str());
+//                StdLog("viest block", "hash %s", pEvent->data.vBlockHash[4].ToString().c_str());
+//                StdLog("viest block", "hash %s", pEvent->data.vBlockHash[5].ToString().c_str());
+
                 pNetChannel->PostEvent(pEvent);
                 return true;
             }
@@ -579,6 +619,9 @@ bool CBbPeerNet::HandlePeerRecvMessage(CPeer* pPeer, int nChannel, int nCommand,
             if (pEvent != nullptr)
             {
                 ssPayload >> pEvent->data;
+
+                pEvent->data.GetHash();
+
                 CInv inv(CInv::MSG_BLOCK, pEvent->data.GetHash());
                 CancelTimer(pBbPeer->Responded(inv));
                 pNetChannel->PostEvent(pEvent);

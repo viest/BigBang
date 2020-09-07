@@ -1623,6 +1623,7 @@ Errno CBlockChain::VerifyBlock(const uint256& hashBlock, const CBlock& block, CB
             return ERR_BLOCK_PROOF_OF_STAKE_INVALID;
         }
 
+        // 对比区块权重，如果同一个高度区块权重过低，则会被高权重区块替代（回滚）
         if (agreement.nAgreement != proof.nAgreement || agreement.nWeight != proof.nWeight
             || agreement.IsProofOfWork())
         {

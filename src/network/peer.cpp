@@ -64,6 +64,12 @@ bool CBbPeer::SendMessage(int nChannel, int nCommand, CBufStream& ssPayload)
     hdrSend.nPayloadChecksum = bigbang::crypto::CryptoHash(ssPayload.GetData(), ssPayload.GetSize()).Get32();
     hdrSend.nHeaderChecksum = hdrSend.GetHeaderChecksum();
 
+    if (nChannel == PROTO_CHN_DATA && (nCommand == PROTO_CMD_GETDATA || nCommand == PROTO_CMD_GETBLOCKS)) {
+        StdLog("viest send message peer", "chn %d, cmd %d", nChannel, nCommand);
+    } else {
+        StdLog("viest send message peer", "chn %d, cmd %d", nChannel, nCommand);
+    }
+
     if (!hdrSend.Verify())
     {
         return false;

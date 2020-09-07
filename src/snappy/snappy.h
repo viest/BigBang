@@ -74,7 +74,7 @@ bool GetUncompressedLength(Source* source, uint32* result);
 // Original contents of *output are lost.
 //
 // REQUIRES: "input[]" is not an alias of "*output".
-size_t Compress(const char* input, size_t input_length, string* output);
+size_t Compress(const char* input, size_t input_length, std::string* output);
 
 // Decompresses "compressed[0,compressed_length-1]" to "*uncompressed".
 // Original contents of "*uncompressed" are lost.
@@ -83,7 +83,7 @@ size_t Compress(const char* input, size_t input_length, string* output);
 //
 // returns false if the message is corrupted and could not be decompressed
 bool Uncompress(const char* compressed, size_t compressed_length,
-                string* uncompressed);
+                std::string* uncompressed);
 
 // Decompresses "compressed" to "*uncompressed".
 //

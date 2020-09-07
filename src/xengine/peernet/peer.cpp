@@ -90,6 +90,8 @@ CBufStream& CPeer::WriteStream()
 
 void CPeer::Read(size_t nLength, CompltFunc fnComplt)
 {
+    StdLog("viest read", "length: %d", nLength);
+
     ssRecv.Clear();
     pClient->Read(ssRecv, nLength,
                   boost::bind(&CPeer::HandleRead, this, _1, fnComplt));

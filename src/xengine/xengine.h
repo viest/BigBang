@@ -5,6 +5,7 @@
 #ifndef XENGINE_XENGINE_H
 #define XENGINE_XENGINE_H
 
+#include <boost/bind.hpp>
 #include <base/base.h>
 #include <cache.h>
 #include <compacttv.h>

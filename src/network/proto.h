@@ -29,6 +29,7 @@ enum
     PROTO_CHN_USER = 3,
 };
 
+// Network
 enum
 {
     PROTO_CMD_HELLO = 1,
@@ -39,6 +40,7 @@ enum
     PROTO_CMD_PONG = 6,
 };
 
+// Data
 enum
 {
     PROTO_CMD_SUBSCRIBE = 1,

@@ -38,6 +38,7 @@ CPeerNet::~CPeerNet()
 
 void CPeerNet::ConfigNetwork(CPeerNetConfig& config)
 {
+    // 配置网络节点（配置文件中的connect）
     confNetwork = config;
 }
 

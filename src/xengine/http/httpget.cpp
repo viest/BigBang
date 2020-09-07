@@ -4,6 +4,7 @@
 
 #include "httpget.h"
 
+#include <boost/bind.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
 #include "httputil.h"

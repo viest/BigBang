@@ -750,6 +750,8 @@ bool CNetChannel::HandleEvent(network::CEventPeerInv& eventInv)
             {
                 if (inv.nType == network::CInv::MSG_TX)
                 {
+                    StdLog("viest tx", "hash: %s", inv.nHash.ToString().c_str());
+
                     vTxHash.push_back(inv.nHash);
                     if ((nLastBlockHeight == 0 || CTxId(inv.nHash).GetTxTime() < nLastTime + MAX_TXINV_INTERVAL_TIME)
                         && !pTxPool->Exists(inv.nHash) && !pBlockChain->ExistsTx(inv.nHash))

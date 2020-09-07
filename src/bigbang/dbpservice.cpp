@@ -770,6 +770,11 @@ bool CDbpService::HandleEvent(CBbEventDbpUpdateNewBlock& event)
     {
         CBbDbpBlock block;
         CreateDbpBlock(newBlock, forkHash, blockHeight, block);
+
+//        if (block.vtx.size() > 0) {
+//            exit(1);
+//        }
+
         PushBlock(forkHash.ToString(),block);
     }
 

@@ -4,6 +4,7 @@
 
 #include "httpserver.h"
 
+#include <boost/bind.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <openssl/rand.h>
 
